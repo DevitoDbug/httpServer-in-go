@@ -3,23 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+	"simpleWebServer/pkg/server"
 	"time"
 )
-
-var indexPage = `
-<!DOCTYPE html>
-<html>
-<body style = "width: 500px ; margin: 0 auto;">
-<h1>Our first server</h2>
-<p>Every http handler handles a request and a response</p>
-
-</body>
-</html>
-`
-var userInfo = `{
-"name":"testUser",
-"age":21
-}`
 
 func main() {
 
@@ -27,26 +13,11 @@ func main() {
 
 	mux := http.NewServeMux() //handler
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("content-Type", "text/html")
-		w.WriteHeader(http.StatusAccepted)
-		_, err := w.Write([]byte(indexPage))
-		if err != nil {
-			log.Printf("%v", err)
-		}
-
-	})
+	myServer := server.New()
+	mux.HandleFunc("/", myServer.HandleIndex)
 
 	//Adding the user route
-	mux.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("content-Type", "text/html")
-		w.WriteHeader(http.StatusAccepted)
-		_, err := w.Write([]byte(userInfo))
-		if err != nil {
-			log.Printf("%v", err)
-		}
-
-	})
+	mux.HandleFunc("/users", myServer.HandleUser)
 
 	s := &http.Server{
 		Addr:           address,
